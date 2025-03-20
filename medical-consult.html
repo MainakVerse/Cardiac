@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Cardiac Chatbot</title>
+  <meta name="description" content="Cardiac health chatbot interface">
+  <meta name="keywords" content="cardiac, health, chatbot">
+
+ <!-- Google Fonts -->
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+ <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Noto+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Questrial:wght@400&display=swap" rel="stylesheet">
+
+ <!-- Bootstrap CSS -->
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+ <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+ 
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 50%, #ffcc80 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header Styles */
+    .header {
+      background-color: white;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 15px 0;
+      width: 100%;
+      z-index: 100;
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .logo {
+      text-decoration: none;
+      color: #000;
+    }
+
+    .sitename {
+      font-size: 1.8rem;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .navmenu ul {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 20px;
+    }
+
+    .navmenu a {
+      color: #333;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .navmenu a:hover, .navmenu a.active {
+      color: #ff9800;
+    }
+
+    .header-social-links {
+      display: flex;
+      gap: 15px;
+    }
+
+    .header-social-links a {
+      color: #333;
+      font-size: 1.2rem;
+      transition: color 0.3s;
+    }
+
+    .header-social-links a:hover {
+      color: #ff9800;
+    }
+
+    .mobile-nav-toggle {
+      display: none;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .chat-container {
+      width: 100%;
+      max-width: 1000px;
+      border: 1px solid #000;
+      border-radius: 8px;
+      padding: 20px;
+      background-color: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .chat-area {
+      min-height: 400px;
+      max-height: 60vh;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      padding: 10px;
+      border-radius: 5px;
+      background-color: #fff;
+      border: 1px solid #eee;
+    }
+
+    .input-container {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .query-input {
+      flex-grow: 1;
+      min-width: 200px;
+      border: 1px solid #000;
+      border-radius: 5px;
+      padding: 10px 15px;
+      font-size: 16px;
+    }
+
+    .ask-button {
+      background-color: #fff;
+      border: 1px solid #000;
+      border-radius: 5px;
+      padding: 10px 25px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+    }
+
+    .ask-button:hover {
+      background-color: #ffcc80;
+      transform: translateY(-2px);
+    }
+
+    .ask-button:active {
+      transform: translateY(0);
+    }
+
+    .message {
+      margin-bottom: 15px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+
+    .user-message {
+      background-color: #e3f2fd;
+      margin-left: auto;
+      border-bottom-right-radius: 0;
+    }
+
+    .bot-message {
+      background-color: #fff8e1;
+      margin-right: auto;
+      border-bottom-left-radius: 0;
+    }
+
+    /* Remove typing indicator animation for complete messages */
+    .bot-response {
+      display: block;
+      width: 100%;
+    }
+
+    .thinking {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      background-color: #333;
+      border-radius: 50%;
+      margin: 0 3px;
+      animation: bounce 1.5s infinite ease-in-out;
+    }
+
+    .dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-6px);
+      }
+    }
+
+    /* Responsive design */
+    @media (max-width: 992px) {
+      .header-container {
+        justify-content: space-between !important;
+      }
+      
+      .navmenu {
+        position: fixed;
+        top: 70px;
+        right: -100%;
+        background: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        transition: right 0.3s ease;
+        width: 250px;
+        z-index: 999;
+      }
+
+      .navmenu.active {
+        right: 0;
+      }
+
+      .navmenu ul {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .mobile-nav-toggle {
+        display: block;
+      }
+
+      .header-social-links {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .chat-container {
+        padding: 15px;
+      }
+
+      .chat-area {
+        min-height: 300px;
+      }
+
+      .message {
+        max-width: 90%;
+      }
+      
+      .main-content {
+        padding: 20px 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .input-container {
+        flex-direction: column;
+      }
+
+      .query-input {
+        width: 100%;
+      }
+
+      .ask-button {
+        width: 100%;
+      }
+      
+      .sitename {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header id="header" class="header sticky-top">
+    <div class="header-container d-flex align-items-center justify-content-between">
+      <a href="index.html" class="logo d-flex align-items-center">
+        <h1 class="sitename">Cardiac</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="index.html#hero" class="active">Home</a></li>
+          <li><a href="index.html#appointment">Appointment</a></li>
+          <li><a href="index.html#services">Services</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-social-links">
+        <a href="#" class="twitter"><i class="bi bi-twitter-x"></i></a>
+        <a href="#" class="facebook"><i class="bi bi-facebook"></i></a>
+        <a href="#" class="instagram"><i class="bi bi-instagram"></i></a>
+        <a href="#" class="linkedin"><i class="bi bi-linkedin"></i></a>
+      </div>
+      
+      <i class="mobile-nav-toggle bi bi-list"></i>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="chat-container">
+      <div class="chat-area" id="chatArea">
+        <!-- Conversation will appear here -->
+        <div class="message bot-message">
+          <strong>Cardiac Chatbot:</strong> Hello! I'm your cardiac health assistant. How can I help you with heart-related questions today?
+        </div>
+      </div>
+      <div class="input-container">
+        <input type="text" id="userQuery" class="query-input" placeholder="Type your query here...">
+        <button id="askButton" class="ask-button">Ask</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Replace this with your actual Gemini API key
+    const API_KEY = 'AIzaSyAqFE6lujGa-Q7NDWLR4maMvt2VP9U41zI';
+    const API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent';
+
+    document.getElementById("askButton").addEventListener("click", handleUserQuery);
+    document.getElementById("userQuery").addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        handleUserQuery();
+      }
+    });
+
+    // Mobile menu toggle
+    document.querySelector('.mobile-nav-toggle').addEventListener('click', function() {
+      document.querySelector('.navmenu').classList.toggle('active');
+      this.classList.toggle('bi-list');
+      this.classList.toggle('bi-x');
+    });
+
+    // List of cardiac health related keywords
+    const cardiacKeywords = [
+      'heart', 'cardiac', 'cardiovascular', 'artery', 'chest pain', 'palpitations', 'blood pressure', 
+      'hypertension', 'cholesterol', 'ecg', 'ekg', 'echocardiogram', 'arrhythmia', 'atrial fibrillation',
+      'bradycardia', 'tachycardia', 'angina', 'myocardial', 'infarction', 'coronary', 'bypass', 
+      'angioplasty', 'stent', 'valve', 'pacemaker', 'defibrillator', 'cardiology', 'cardiologist',
+      'heart attack', 'stroke', 'cpr', 'aed', 'murmur', 'heart failure', 'lipid', 'statins', 
+      'anticoagulant', 'warfarin', 'beta blocker', 'ace inhibitor', 'aspirin', 'clogged arteries',
+      'ventricle', 'atrium', 'aorta', 'vein', 'pulse', 'circulation', 'lifestyle', 'exercise',
+      'diet', 'smoking', 'obesity', 'diabetes', 'stress', 'family history', 'medication', 'symptoms'
+    ];
+
+    function isCardiacRelated(query) {
+      query = query.toLowerCase();
+      return cardiacKeywords.some(keyword => query.includes(keyword.toLowerCase()));
+    }
+
+    async function handleUserQuery() {
+      const queryInput = document.getElementById("userQuery");
+      const query = queryInput.value.trim();
+      const chatArea = document.getElementById("chatArea");
+      
+      if (query === "") return;
+
+      // Add user query to chat
+      const userMessage = document.createElement("div");
+      userMessage.className = "message user-message";
+      userMessage.innerHTML = `<strong>You:</strong> ${query}`;
+      chatArea.appendChild(userMessage);
+      
+      // Clear input
+      queryInput.value = "";
+
+      // Scroll to bottom
+      chatArea.scrollTop = chatArea.scrollHeight;
+
+      // Add thinking animation
+      const thinkingDiv = document.createElement("div");
+      thinkingDiv.className = "thinking message bot-message";
+      thinkingDiv.innerHTML = `
+        <div class="dot"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      `;
+      chatArea.appendChild(thinkingDiv);
+      chatArea.scrollTop = chatArea.scrollHeight;
+
+      // Check if query is cardiac related
+      if (!isCardiacRelated(query)) {
+        // Remove thinking animation
+        setTimeout(() => {
+          chatArea.removeChild(thinkingDiv);
+          
+          // Add bot response without typing effect
+          const botResponse = document.createElement("div");
+          botResponse.className = "message bot-message";
+          botResponse.innerHTML = `<strong>Cardiac Chatbot:</strong> I'm sorry, but I can only answer questions related to cardiac health. Please ask me about heart health, cardiovascular diseases, treatments, or best practices.`;
+          
+          chatArea.appendChild(botResponse);
+          chatArea.scrollTop = chatArea.scrollHeight;
+        }, 1500);
+        return;
+      }
+
+      try {
+        // Format the prompt to focus on cardiac health
+        const promptText = `You are a highly specialized medical chatbot trained exclusively in cardiac arrest detection, symptoms, treatment, prevention, and its health implications. Your responses must be medically accurate, clear, and concise, based on current medical guidelines and best practices.
+
+Instructions for Response:
+Relevance: Only answer questions strictly related to cardiac arrest (e.g., causes, symptoms, diagnosis, treatment, first aid, prevention, risk factors, post-recovery care, and associated medical conditions).
+Medical Accuracy: Ensure all responses align with scientifically validated medical knowledge, referencing common medical guidelines (e.g., American Heart Association, European Resuscitation Council).
+Clarity & Conciseness: Provide direct, structured, and well-explained answers using layman-friendly language unless the user asks for advanced medical terminology.
+Handling Unrelated Queries: If a question is not related to cardiac arrest, politely inform the user that you specialize only in cardiac arrest-related information and cannot provide assistance on other medical topics.
+Urgency Disclaimer: Always include a disclaimer that your advice is for informational purposes only and does not replace professional medical consultation. If the user describes a medical emergency, advise them to seek immediate medical attention or call emergency services.
+User's Question:
+"${query}"
+
+Response Structure:
+Direct Answer: Provide an immediate response based on the user's query.
+Additional Information (if applicable): Expand on key points if necessary, such as risk factors, treatment options, or lifestyle changes.
+Emergency Disclaimer (if needed): If the user's question suggests an emergency (e.g., "What should I do if someone collapses?"), immediately recommend calling emergency services before giving first-aid guidance.`;
+        
+        // Send request to Gemini API
+        const response = await fetch(`${API_URL}?key=${API_KEY}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: promptText
+              }]
+            }]
+          })
+        });
+
+        const data = await response.json();
+        let botReply = "I apologize, but I couldn't process your question. Please try again.";
+        
+        // Extract the text from the Gemini API response
+        if (data.candidates && data.candidates[0] && data.candidates[0].content && 
+            data.candidates[0].content.parts && data.candidates[0].content.parts[0]) {
+          botReply = data.candidates[0].content.parts[0].text;
+        }
+
+        // Remove thinking animation after delay
+        setTimeout(() => {
+          chatArea.removeChild(thinkingDiv);
+          
+          // Add bot response without typing effect
+          const botResponse = document.createElement("div");
+          botResponse.className = "message bot-message";
+          botResponse.innerHTML = `<strong>Cardiac Chatbot:</strong> ${botReply}`;
+          
+          chatArea.appendChild(botResponse);
+          chatArea.scrollTop = chatArea.scrollHeight;
+        }, 1500);
+
+      } catch (error) {
+        console.error('Error:', error);
+        
+        // Remove thinking animation
+        chatArea.removeChild(thinkingDiv);
+        
+        // Add error message
+        const errorMessage = document.createElement("div");
+        errorMessage.className = "message bot-message";
+        errorMessage.innerHTML = `<strong>Cardiac Chatbot:</strong> I'm sorry, but I experienced a technical issue. Please try again later.`;
+        chatArea.appendChild(errorMessage);
+        chatArea.scrollTop = chatArea.scrollHeight;
+      }
+    }
+  </script>
+</body>
+</html>
